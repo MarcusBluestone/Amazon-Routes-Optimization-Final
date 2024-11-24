@@ -1,6 +1,7 @@
 # Optimization Final Project (6.C57)
 ## Instructions (Main)
-- `python main.py` into terminal
+- `python main.py --size --N --S ` into terminal
+- size is the size of simulated grid; N is the number of demand locations; S is the number of trucks
 - Final image ouputted in graph.jpg
 
 

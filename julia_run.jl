@@ -10,7 +10,8 @@ Ty = CSV.read("inputs/Ty.csv",DataFrame, drop=1:1)|> Matrix; #M, N
 Tz = CSV.read("inputs/Tz.csv",DataFrame, drop=1:1)|> Matrix; #N, M
 
 M,N = size(Ty)
-S = 5
+S = parse(Int, ARGS[1])
+
 
 Cf = 1
 Cw = 1

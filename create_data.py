@@ -3,9 +3,15 @@ import numpy as np
 import pandas as pd
 import json
 
+import argparse
 
-size = 20 #40
-demand_cnt = 75#100
+parser = argparse.ArgumentParser(description="")
+parser.add_argument("--size", type=str, required=True, help="Grid Size")
+parser.add_argument("--demand_cnt", type=str, required=True, help="# Demand")
+args = parser.parse_args()
+
+size = int(args.size) #40
+demand_cnt = int(args.demand_cnt) #100
 
 def get_time(loc1, loc2):
     return abs(loc1[0]  - loc2[0]) + abs(loc1[1]  - loc2[1])
