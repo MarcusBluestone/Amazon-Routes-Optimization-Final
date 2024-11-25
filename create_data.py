@@ -12,6 +12,7 @@ args = parser.parse_args()
 
 size = int(args.size) #40
 demand_cnt = int(args.demand_cnt) #100
+factory_cnt = 300
 
 def get_time(loc1, loc2):
     return abs(loc1[0]  - loc2[0]) + abs(loc1[1]  - loc2[1])
@@ -28,6 +29,8 @@ def get_data(size):
     candidate_facilties = []
     for i in range(size):
         for j in range(size):
+            if len(candidate_facilties) == factory_cnt:
+                break
             if grid[i,j] == 0:
                 candidate_facilties.append((i,j))
 
