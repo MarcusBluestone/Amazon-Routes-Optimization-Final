@@ -8,11 +8,13 @@ import argparse
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("--size", type=str, required=True, help="Grid Size")
 parser.add_argument("--demand_cnt", type=str, required=True, help="# Demand")
+parser.add_argument("--M", type=str, required=False, help="Number of Candidate Factories")
+
 args = parser.parse_args()
 
 size = int(args.size) #40
 demand_cnt = int(args.demand_cnt) #100
-factory_cnt = 300
+factory_cnt = int(args.M)
 
 def get_time(loc1, loc2):
     return abs(loc1[0]  - loc2[0]) + abs(loc1[1]  - loc2[1])

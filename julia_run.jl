@@ -11,18 +11,18 @@ Tz = CSV.read("inputs/Tz.csv",DataFrame, drop=1:1)|> Matrix; #N, M
 
 M,N = size(Ty)
 S = parse(Int, ARGS[1])
-
+alpha = parse(Float64, ARGS[2])
 
 Cf = 1
 Cw = 1
 Ct = 3
-alpha = 1
+println("a: ", alpha)
 println("M: ", M)
 println("N: ", N)
 println("S: ", S)
 
 model = Model(Gurobi.Optimizer)
-# set_optimizer_attribute(model, "TimeLimit", 240)
+set_optimizer_attribute(model, "TimeLimit", 60 * 60 * 4)
 
 
 @variable(model, o[1:M], Bin)
@@ -31,18 +31,18 @@ model = Model(Gurobi.Optimizer)
 @variable(model, z[1:S, 1:N, 1:M], Bin)
 @variable(model, f[1:S] >= 0)
 @variable(model, u[1:S, 1:N]) #k, j
-# @variable(model, L >= 0)
+@variable(model, L >= 0)
 
 
-@objective(model, Min, (Cf*sum(o[i] for i in 1:M) + 
-Ct * sum(y[k, i, j] for k in 1:S, i in 1:M, j in 1:N) + 
-Cw * sum(sum(y[k,i,j]*Ty[i,j] + z[k,j,i]*Tz[j,i] for i in 1:M, j in 1:N) + sum(x[k, j1, j2] * Tx[j1, j2] for j1 in 1:N, j2 in 1:N) for k in 1:S)))
-
-
-# @objective(model, Min, alpha*(Cf*sum(o[i] for i in 1:M) + 
+# @objective(model, Min, (Cf*sum(o[i] for i in 1:M) + 
 # Ct * sum(y[k, i, j] for k in 1:S, i in 1:M, j in 1:N) + 
-# Cw * sum(sum(y[k,i,j]*Ty[i,j] + z[k,j,i]*Tz[j,i] for i in 1:M, j in 1:N) + sum(x[k, j1, j2] * Tx[j1, j2] for j1 in 1:N, j2 in 1:N) for k in 1:S)) +
-# (1 - alpha) * L)
+# Cw * sum(sum(y[k,i,j]*Ty[i,j] + z[k,j,i]*Tz[j,i] for i in 1:M, j in 1:N) + sum(x[k, j1, j2] * Tx[j1, j2] for j1 in 1:N, j2 in 1:N) for k in 1:S)))
+
+
+@objective(model, Min, alpha*(Cf*sum(o[i] for i in 1:M) + 
+Ct * sum(y[k, i, j] for k in 1:S, i in 1:M, j in 1:N) + 
+Cw * sum(sum(y[k,i,j]*Ty[i,j] + z[k,j,i]*Tz[j,i] for i in 1:M, j in 1:N) + sum(x[k, j1, j2] * Tx[j1, j2] for j1 in 1:N, j2 in 1:N) for k in 1:S)) +
+(1 - alpha) * L)
 
 # @objective(model, Min, 0)
 
@@ -117,7 +117,7 @@ for k in 1:S
 end
 
 for k in 1:S 
-    @constraint(model, f[k] <= 25)
+    @constraint(model, f[k] <= L)
 end
 
 optimize!(model)

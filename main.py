@@ -7,11 +7,15 @@ if __name__ == "__main__":
     parser.add_argument("--N", type=int, required=False, help="Number of Demands")
     parser.add_argument("--size", type=int, required=False, help="Size of the grid")
     parser.add_argument("--S", type=int, required=False, help="Number of trucks")
+    parser.add_argument("--M", type=int, required=False, help="Number of Candidate Factories")
+    parser.add_argument("--a", type=float, required=False, help="Alpha Value")
+
 
     args = parser.parse_args()
     print(args)
-    subprocess.run(["python", 'create_data.py', '--size', str(args.size), '--demand_cnt', str(args.N)], check=True)
-    subprocess.run(["julia", 'julia_run.jl', str(args.S)], check=True)
+    subprocess.run(["python", 'create_data.py', '--size', str(args.size), '--demand_cnt', str(args.N),
+                                                '--M', str(args.M)], check=True)
+    subprocess.run(["julia", 'julia_run.jl', str(args.S), str(args.a)], check=True)
     subprocess.run(["python", 'analyze.py'], check=True)
 
 
