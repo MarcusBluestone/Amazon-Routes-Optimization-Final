@@ -22,7 +22,7 @@ println("N: ", N)
 println("S: ", S)
 
 model = Model(Gurobi.Optimizer)
-set_optimizer_attribute(model, "TimeLimit", 60 * 60 * 4)
+set_optimizer_attribute(model, "TimeLimit", 60 * 60 * 7)
 
 
 @variable(model, o[1:M], Bin)
