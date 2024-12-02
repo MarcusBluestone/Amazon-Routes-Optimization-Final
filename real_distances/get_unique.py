@@ -17,3 +17,5 @@ unique_stores.to_csv('real_distances/unique_stores.csv', index=False)
 unique_drops.to_csv('real_distances/unique_drops.csv', index=False)
 
 print("Unique store and drop locations saved to 'unique_stores.csv' and 'unique_csv.csv'.")
+
+
