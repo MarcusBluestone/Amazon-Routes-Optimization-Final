@@ -1,17 +1,33 @@
 import h5py
-import json
+# import json
 import numpy as np
-
-# import matplotlib.colors as mcolors
+import pandas as pd
+import argparse
 
 import networkx as nx
 import matplotlib.pyplot as plt
 
 
-with open('inputs/info.json', 'r') as f:
-    info_json = json.load(f)
-cand_factories = np.array(info_json['factories'])
-demands = np.array(info_json['demands'])
+# with open('inputs/info.json', 'r') as f:
+#     info_json = json.load(f)
+# cand_factories = np.array(info_json['factories'])
+# demands = np.array(info_json['demands'])
+
+parser = argparse.ArgumentParser(description="A sample Python script.")
+parser.add_argument("--N", type=str, required=True, help="Number of Demands")
+args = parser.parse_args()
+
+try:
+    N = int(args.N)
+except ValueError:
+    N = 4356
+
+scale = 1
+unique_stores_pd = pd.read_csv('real_distances/unique_stores.csv').applymap(lambda x : scale * x)
+demands_pd = pd.read_csv('real_distances/unique_drops.csv').applymap(lambda x : scale * x)
+
+cand_factories = list(zip(unique_stores_pd['Latitude'], unique_stores_pd['Longitude']))
+demands = list(zip(demands_pd['Latitude'][:N], demands_pd['Longitude'][:N]))
 
 with h5py.File('results/output.h5', 'r') as f:
     # List all datasets
@@ -73,7 +89,7 @@ node_colors = [G.nodes[node]['color'] for node in G.nodes]
 edge_colors = [G.edges[edge]['color'] for edge in G.edges]
 pos = nx.get_node_attributes(G, 'pos')  
 
-plt.figure(3,figsize=(10,10)) 
+plt.figure(3,figsize=(100,100)) 
 
 nodes = nx.draw_networkx_nodes(G, pos=pos, node_color=node_colors)
 nodes.set_zorder(1)

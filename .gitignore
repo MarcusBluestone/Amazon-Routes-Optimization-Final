@@ -6,5 +6,6 @@ inputs/*
 
 graph.jpg
 growth.png
+durations.pkl
 
 real_distances/drop_distance_matrix.csv

@@ -5,14 +5,17 @@ using DataFrames
 using HDF5
 using Base.Threads
 
-Tx = CSV.read("real_distances/drop_distance_matrix.csv", DataFrame, drop=1:1) |> Matrix #N, N
-Ty = CSV.read("real_distances/distance_matrix_store_to_drop.csv",DataFrame, drop=1:1) |> Matrix; #M, N
-Tz = CSV.read("real_distances/drop_to_store_distance_matrix.csv",DataFrame, drop=1:1) |> Matrix; #N, M
+S = parse(Int, ARGS[1])
+alpha = parse(Float64, ARGS[2])
+N = parse(Int, ARGS[3])
+
+Tx = CSV.read("real_distances/drop_distance_matrix.csv", DataFrame, drop=1:1)[1:N, 1:N] |> Matrix #N, N
+Ty = CSV.read("real_distances/distance_matrix_store_to_drop.csv",DataFrame, drop=1:1)[:, 1:N] |> Matrix; #M, N
+Tz = CSV.read("real_distances/drop_to_store_distance_matrix.csv",DataFrame, drop=1:1)[1:N, :] |> Matrix; #N, M
+
 
 
 M,N = size(Ty)
-S = parse(Int, ARGS[1])
-alpha = parse(Float64, ARGS[2])
 
 Cf = 1
 Cw = 1
@@ -24,7 +27,6 @@ println("S: ", S)
 
 model = Model(Gurobi.Optimizer)
 set_optimizer_attribute(model, "TimeLimit", 60 * 60 * 7)
-
 
 @variable(model, o[1:M], Bin)
 @variable(model, x[1:S, 1:N, 1:N], Bin)
@@ -47,18 +49,14 @@ Cw * sum(sum(y[k,i,j]*Ty[i,j] + z[k,j,i]*Tz[j,i] for i in 1:M, j in 1:N) + sum(x
 
 #MTZ Constraitns
 
-        # @constraint(model, u[j] >= 1)
+println("here")
+# @constraint(model, u[j] >= 1)
 @constraint(model, [k=1:S, j=1:N], u[j] <= N)
   
 
 #(MTZ) Between Demand Locations
-for j1 in 1:N
-    for j2 in 1:N
-        if j1 != j2
-            @constraint(model, u[j2] - u[j1] >= 1 - N * (1 - sum(x[k, j1, j2] for k in 1:S)))
-        end
-    end
-end
+@constraint(model, [j1=1:N, j2=1:N; j1 != j2], u[j2] - u[j1] >= 1 - N * (1 - sum(x[k, j1, j2] for k in 1:S)))
+
 
 # Optional additional constriant
 
