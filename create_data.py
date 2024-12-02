@@ -28,15 +28,22 @@ def get_data(size):
         demand_locations.add((rand_row, rand_col))
         grid[rand_row, rand_col] = 1
     
-    candidate_facilties = []
-    for i in range(size):
-        for j in range(size):
-            if len(candidate_facilties) == factory_cnt:
-                break
-            if grid[i,j] == 0:
-                candidate_facilties.append((i,j))
+    candidate_facilties = set()
+    while len(candidate_facilties) < factory_cnt:
+        rand_row, rand_col = random.choice(range(size)), random.choice(range(size))
+        candidate_facilties.add((rand_row, rand_col))
+        if grid[rand_row,rand_col] == 0:
+            candidate_facilties.add((rand_row, rand_col))
+                                       
+    # for i in range(size):
+    #     for j in range(size):
+    #         if len(candidate_facilties) == factory_cnt:
+    #             break
+    #         if grid[i,j] == 0:
+    #             candidate_facilties.append((i,j))
 
     demand_locations = list(demand_locations)
+    candidate_facilties = list(candidate_facilties)
 
     Tx = np.zeros((demand_cnt, demand_cnt))
     for j1 in range(demand_cnt):
