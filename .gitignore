@@ -3,3 +3,8 @@ results/*
 
 # Ignore everything in the inputs folder
 inputs/*
+
+graph.jpg
+growth.png
+
+real_distances/drop_distance_matrix.csv
