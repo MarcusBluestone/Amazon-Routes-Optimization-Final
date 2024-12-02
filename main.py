@@ -5,7 +5,7 @@ import argparse
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="A sample Python script.")
-    # parser.add_argument("--N", type=int, required=False, help="Number of Demands")
+    parser.add_argument("--N", type=int, required=False, help="Number of Demands")
     parser.add_argument("--size", type=int, required=False, help="Size of the grid")
     parser.add_argument("--S", type=int, required=False, help="Number of trucks")
     parser.add_argument("--M", type=int, required=False, help="Number of Candidate Factories")
