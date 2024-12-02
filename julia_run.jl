@@ -5,9 +5,10 @@ using DataFrames
 using HDF5
 using Base.Threads
 
-Tx = CSV.read("inputs/Tx.csv", DataFrame, drop=1:1) |> Matrix #N, N
-Ty = CSV.read("inputs/Ty.csv",DataFrame, drop=1:1)|> Matrix; #M, N
-Tz = CSV.read("inputs/Tz.csv",DataFrame, drop=1:1)|> Matrix; #N, M
+Tx = CSV.read("real_distances/drop_distance_matrix.csv", DataFrame, drop=1:1) |> Matrix #N, N
+Ty = CSV.read("real_distances/distance_matrix_store_to_drop.csv",DataFrame, drop=1:1) |> Matrix; #M, N
+Tz = CSV.read("real_distances/drop_to_store_distance_matrix.csv",DataFrame, drop=1:1) |> Matrix; #N, M
+
 
 M,N = size(Ty)
 S = parse(Int, ARGS[1])
@@ -45,12 +46,10 @@ Cw * sum(sum(y[k,i,j]*Ty[i,j] + z[k,j,i]*Tz[j,i] for i in 1:M, j in 1:N) + sum(x
 (1 - alpha) * L)
 
 #MTZ Constraitns
-for k in 1:S
-    for j in 1:N
+
         # @constraint(model, u[j] >= 1)
-        @constraint(model, u[j] <= N)
-    end
-end
+@constraint(model, [k=1:S, j=1:N], u[j] <= N)
+  
 
 #(MTZ) Between Demand Locations
 for j1 in 1:N
@@ -62,59 +61,52 @@ for j1 in 1:N
 end
 
 # Optional additional constriant
-for j in 1:N
-    for k in 1:S
-        @constraint(model, x[k,j,j] == 0)
-    end
-end
+
+@constraint(model, [j=1:N, k=1:S],x[k,j,j] == 0)
+
 # end additional constraint
 
 #A truck can leave from at most one factory
-for k in 1:S
-    @constraint(model, sum(y[k,i,j] for i in 1:M, j in 1:N) <= 1)
-end
+
+@constraint(model, [k=1:S], sum(y[k,i,j] for i in 1:M, j in 1:N) <= 1)
+
 
 #Trucks can only travel if they first leave from a factory 
-for k in 1:S
-    @constraint(model, sum(x[k,j1,j2] for j1 in 1:N, j2 in 1:N) <= (N - 1) * sum(y[k,i,j] for i in 1:M, j in 1:N))
-end
+
+@constraint(model, [k=1:S], sum(x[k,j1,j2] for j1 in 1:N, j2 in 1:N) <= (N - 1) * sum(y[k,i,j] for i in 1:M, j in 1:N))
+
 
 #Trucks can only leave used factories
-for i in 1:M
-    @constraint(model, sum(y[k,i,j] for k in 1:S, j in 1:N) <= S * o[i]) #changed this from N to S
-end
+
+@constraint(model, [i=1:M], sum(y[k,i,j] for k in 1:S, j in 1:N) <= S * o[i]) #changed this from N to S
+
 
 #Trucks start and end at the same factory
-for k in 1:S
-    for i in 1:M
-        @constraint(model, sum(z[k,j,i] for j in 1:N) == sum(y[k,i,j] for j in 1:N))
-    end
-end
+
+@constraint(model, [k=1:S, i=1:M], sum(z[k,j,i] for j in 1:N) == sum(y[k,i,j] for j in 1:N))
+
 
 #FLOW CONSTRAINTS
-for j2 in 1:N #SUM IN = 1
-    @constraint(model, sum(sum(y[k,i,j2] for i in 1:M) + sum(x[k,j1,j2] for j1 in 1:N) for k in 1:S) == 1)
-end 
+#SUM IN = 1
+@constraint(model, [j2=1:N], sum(sum(y[k,i,j2] for i in 1:M) + sum(x[k,j1,j2] for j1 in 1:N) for k in 1:S) == 1)
+
 
 # for j1 in 1:N  #SUM OUT = 1
 #     @constraint(model, sum(sum(x[k,j1,j2] for j2 in 1:N) + sum(z[k,j1,i] for i in 1:M) for k in 1:S) == 1)
 # end 
 
 #If truck k enters location j, it must exit location j
-for j in 1:N
-    for k in 1:S
-        @constraint(model, (sum(y[k,i,j] for i in 1:M) + sum(x[k,j1,j] for j1 in 1:N)) == (sum(x[k,j,j2] for j2 in 1:N) + sum(z[k,j,i] for i in 1:M)) )
-    end
-end
+
+@constraint(model, [j=1:N, k=1:S],(sum(y[k,i,j] for i in 1:M) + sum(x[k,j1,j] for j1 in 1:N)) == (sum(x[k,j,j2] for j2 in 1:N) + sum(z[k,j,i] for i in 1:M)) )
+
 
 # Time constraints
-for k in 1:S
-    @constraint(model, f[k] == sum(y[k,i,j] * Ty[i,j] for i in 1:M, j in 1:N) + sum(x[k,j1,j2] * Tx[j1,j2] for j1 in 1:N, j2 in 1:N))
-end
 
-for k in 1:S 
-    @constraint(model, f[k] <= L)
-end
+@constraint(model, [k=1:S], f[k] == sum(y[k,i,j] * Ty[i,j] for i in 1:M, j in 1:N) + sum(x[k,j1,j2] * Tx[j1,j2] for j1 in 1:N, j2 in 1:N))
+
+
+
+@constraint(model, [k=1:S], f[k] <= L)
 
 optimize!(model)
 
