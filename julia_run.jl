@@ -48,9 +48,6 @@ Cw * sum(sum(y[k,i,j]*Ty[i,j] + z[k,j,i]*Tz[j,i] for i in 1:M, j in 1:N) + sum(x
 (1 - alpha) * L)
 
 #MTZ Constraitns
-
-println("here")
-# @constraint(model, u[j] >= 1)
 @constraint(model, [k=1:S, j=1:N], u[j] <= N)
   
 

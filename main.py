@@ -31,6 +31,6 @@ if __name__ == "__main__":
             # with open('durations.pkl', 'wb') as f:
             #     pickle.dump(durations, f)
     else:
-      #  subprocess.run(["julia", 'julia_run.jl', str(args.S), str(args.a), str(args.N)], check=True)
+        subprocess.run(["julia", 'julia_run.jl', str(args.S), str(args.a), str(args.N)], check=True)
         subprocess.run(["python", 'analyze.py', '--N', str(args.N)], check=True)
 
