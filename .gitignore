@@ -6,3 +6,5 @@ inputs/*
 
 graph.jpg
 growth.png
+
+real_distances/drop_distance_matrix.csv
