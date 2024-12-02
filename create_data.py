@@ -29,7 +29,6 @@ def get_data(size):
     candidate_facilties = set()
     while len(candidate_facilties) < factory_cnt:
         rand_row, rand_col = random.choice(range(size)), random.choice(range(size))
-        candidate_facilties.add((rand_row, rand_col))
         if (rand_row, rand_col) not in demand_locations:
             candidate_facilties.add((rand_row, rand_col))
 
