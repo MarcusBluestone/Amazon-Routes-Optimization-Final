@@ -30,7 +30,7 @@ set_optimizer_attribute(model, "TimeLimit", 60 * 60 * 7)
 @variable(model, y[1:S, 1:M, 1:N], Bin)
 @variable(model, z[1:S, 1:N, 1:M], Bin)
 @variable(model, f[1:S] >= 0)
-@variable(model, u[1:N])
+@variable(model, u[1:N] >= 1)
 @variable(model, L >= 0)
 
 
@@ -47,7 +47,7 @@ Cw * sum(sum(y[k,i,j]*Ty[i,j] + z[k,j,i]*Tz[j,i] for i in 1:M, j in 1:N) + sum(x
 #MTZ Constraitns
 for k in 1:S
     for j in 1:N
-        @constraint(model, u[j] >= 1)
+        # @constraint(model, u[j] >= 1)
         @constraint(model, u[j] <= N)
     end
 end

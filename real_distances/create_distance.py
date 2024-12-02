@@ -11,17 +11,17 @@ def calculate_distance(row):
 
 
 if __name__ == "__main__":
-    file_path = 'real_distances/amazon_delivery_cleaned.csv'  # Replace with your Excel file path
+    file_path = 'real_distances/unique_deliveries.csv'  # Replace with your Excel file path
     df = pd.read_csv(file_path)
 
-    # distances_df = pd.DataFrame({
-    #     'Distance_km': df.apply(calculate_distance, axis=1)
-    # })
-    # distances_df.to_csv('real_distances/distances_only.csv', index=False)
-    # print("Distances saved to 'distances_only.csv'.")
+    distances_df = pd.DataFrame({
+        'Distance_km': df.apply(calculate_distance, axis=1)
+    })
+    distances_df.to_csv('real_distances/distances_only_unique.csv', index=False)
+    print("Distances saved to 'distances_only.csv'.")
 
-    file_drops = 'real_distances/unique_drops.csv'
-    file_stores = "real_distances/unique_stores.csv"
+    # file_drops = 'real_distances/unique_drops.csv'
+    # file_stores = "real_distances/unique_stores.csv"
 
     # df_drops = pd.read_csv(file_drops)
     # df_stores = pd.read_csv(file_stores)
@@ -48,16 +48,16 @@ if __name__ == "__main__":
 
     # print("Distance matrix saved to 'distance_matrix.csv'.")
 
-    existing_matrix_file = 'real_distances/distance_matrix_store_to_drop.csv'  # Replace with your file path
-    distance_matrix = pd.read_csv(existing_matrix_file, index_col=0)  # Load with the first column as index
+    # existing_matrix_file = 'real_distances/distance_matrix_store_to_drop.csv'  # Replace with your file path
+    # distance_matrix = pd.read_csv(existing_matrix_file, index_col=0)  # Load with the first column as index
 
-    # Transpose the matrix to flip rows and columns
-    flipped_matrix = distance_matrix.T
+    # # Transpose the matrix to flip rows and columns
+    # flipped_matrix = distance_matrix.T
 
-    # Save the transposed matrix to a new CSV file
-    flipped_matrix.to_csv('real_distances/drop_to_store_distance_matrix.csv', index=True)
+    # # Save the transposed matrix to a new CSV file
+    # flipped_matrix.to_csv('real_distances/drop_to_store_distance_matrix.csv', index=True)
 
-    print("Drop-to-store distance matrix saved to 'drop_to_store_distance_matrix.csv'.")
+    # print("Drop-to-store distance matrix saved to 'drop_to_store_distance_matrix.csv'.")
 
 
 

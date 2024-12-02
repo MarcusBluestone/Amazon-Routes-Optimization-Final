@@ -1,7 +1,7 @@
 import googlemaps
 from datetime import datetime
 
-dist_mat_api = "AIzaSyAC6LGZ5DcyH1M0qrIa-TF3H53ZheYfEzc"
+dist_mat_api = ""
 
 gmaps = googlemaps.Client(key=dist_mat_api)
 
