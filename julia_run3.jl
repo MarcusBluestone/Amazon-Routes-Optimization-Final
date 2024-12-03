@@ -18,8 +18,8 @@ Tz = CSV.read(directory * "/demand_store_distance.csv", DataFrame, drop=1:1) |> 
 M,N = size(Ty)
 
 Cf = 3
-Cw = 1
-Ct = 3
+Cw = .01
+Ct = 1
 println("a: ", alpha)
 println("M: ", M)
 println("N: ", N)
@@ -27,7 +27,7 @@ println("S: ", S)
 
 model = Model(Gurobi.Optimizer)
 set_optimizer_attribute(model, "TimeLimit", 60 * 60 * 7) #for real
-set_optimizer_attribute(model, "TimeLimit", 10 * 60) #for simulated
+set_optimizer_attribute(model, "TimeLimit", 45 * 60) #for simulated
 
 
 @variable(model, o[1:M], Bin)
