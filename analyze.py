@@ -17,12 +17,14 @@ parser = argparse.ArgumentParser(description="A sample Python script.")
 parser.add_argument("--N", type=str, required=True, help="Number of Demands")
 args = parser.parse_args()
 
+N = int(args.N)
+
 scale = 1
 unique_stores_pd = pd.read_csv('real_distances/unique_stores.csv').applymap(lambda x : scale * x)
 demands_pd = pd.read_csv('real_distances/unique_drops.csv').applymap(lambda x : scale * x)
-
+print(demands_pd)
 cand_factories = list(zip(unique_stores_pd['Latitude'], unique_stores_pd['Longitude']))
-demands = list(zip(demands_pd['Latitude'][:N], demands_pd['Longitude'][:N]))
+demands = list(zip(list(demands_pd['Latitude'][:N]), list(demands_pd['Longitude'][:N])))
 
 with h5py.File('results/output.h5', 'r') as f:
     # List all datasets
@@ -84,12 +86,32 @@ node_colors = [G.nodes[node]['color'] for node in G.nodes]
 edge_colors = [G.edges[edge]['color'] for edge in G.edges]
 pos = nx.get_node_attributes(G, 'pos')  
 
-plt.figure(3,figsize=(100,100)) 
+plt.figure(3,figsize=(10,10)) 
 
-nodes = nx.draw_networkx_nodes(G, pos=pos, node_color=node_colors)
+nodes = nx.draw_networkx_nodes(G, pos=pos, node_color=node_colors, node_size=1)
 nodes.set_zorder(1)
-edges = nx.draw_networkx_edges(G, pos=pos, edge_color=edge_colors, connectionstyle='arc3,rad=0.2', arrows=True)
+edges = nx.draw_networkx_edges(G, pos=pos, edge_color=edge_colors, connectionstyle='arc3,rad=0.2', arrows=True, hide_ticks=False)
 # labels = nx.draw_networkx_labels(G, pos=pos, font_size=5)
+plt.xlabel('Latitude', fontsize=12)
+plt.tick_params(
+    axis='both',          # Apply to both x and y axes
+    which='both',         # Apply to both major and minor ticks
+    bottom=True,          # Turn on ticks on the bottom axis
+    top=False,             # Turn on ticks on the top axis
+    left=True,            # Turn on ticks on the left axis
+    right=False,           # Turn on ticks on the right axis
+    labelbottom=True,     # Show labels on the bottom axis
+    labelleft=True        # Show labels on the left axis
+)
 
-plt.savefig("graph.pdf")
+plt.ylabel('Longitude', fontsize=12)
+
+# Ensure axes are visible
+plt.axis('on')
+
+# Adjust layout to prevent labels from being cut off
+plt.tight_layout()
+
+
+plt.savefig("graph.jpg")
 # nx.draw_networkx(G, pos=pos,node_color=node_colors, edge_color=edge_colors,connectionstyle='arc3,rad=0.2', arrows=True, font_size=5)

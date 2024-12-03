@@ -30,7 +30,7 @@ function filter_distance_matrix(matrix, threshold)
 end
 
 # Example usage
-distance_threshold = 21.0  # Example threshold
+distance_threshold = 22.0  # Example threshold
 filtered_Tx = filter_distance_matrix(Tx, distance_threshold)
 filtered_Ty = filter_distance_matrix(Ty, distance_threshold)
 filtered_Tz = filter_distance_matrix(Tz, distance_threshold)
@@ -63,8 +63,6 @@ println("Demand->Factory Edges: ", length(filtered_Tz))
 @variable(model, L >= 0)
 
 println("Variables Created")
-
-@objective(model, Min, 0)
 
 # @objective(model, Min, (Cf*sum(o[i] for i in 1:M) + 
 # Ct * sum(y[k, i, j] for k in 1:S, i in 1:M, j in 1:N) + 
@@ -212,13 +210,15 @@ println("Finished Flow Constraints")
 
 optimize!(model)
 
+println(sum(value.(o)))
 
-try
-    rm("results/output.h5")
-catch
-    1
-end
-h5write("results/output.h5", "factories", value.(o))
-h5write("results/output.h5", "x_edges", value.(x))
-h5write("results/output.h5", "y_edges", value.(y))
-h5write("results/output.h5", "z_edges", value.(z))
+# println()
+# try
+#     rm("results/output.h5")
+# catch
+#     1
+# end
+# h5write("results/output.h5", "factories", value.(o))
+# h5write("results/output.h5", "x_edges", value.(x))
+# h5write("results/output.h5", "y_edges", value.(y))
+# h5write("results/output.h5", "z_edges", value.(z))

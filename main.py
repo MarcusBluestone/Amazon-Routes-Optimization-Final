@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     try:
         N = int(args.N)
-    except TypeError:
+    except (TypeError, ValueError):
         N = 4356
 
     durations = []
@@ -38,5 +38,5 @@ if __name__ == "__main__":
             #     pickle.dump(durations, f)
     else:
         subprocess.run(["julia", 'julia_run2.jl', str(args.S), str(args.a), str(N)], check=True)
-        subprocess.run(["python", 'analyze.py', '--N', str(args.N)], check=True)
+     #   subprocess.run(["python", 'analyze.py', '--N', str(N)], check=True)
 

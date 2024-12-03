@@ -13,8 +13,6 @@ Tx = CSV.read("real_distances/drop_distance_matrix.csv", DataFrame, drop=1:1)[1:
 Ty = CSV.read("real_distances/distance_matrix_store_to_drop.csv",DataFrame, drop=1:1)[:, 1:N] |> Matrix; #M, N
 Tz = CSV.read("real_distances/drop_to_store_distance_matrix.csv",DataFrame, drop=1:1)[1:N, :] |> Matrix; #N, M
 
-
-
 M,N = size(Ty)
 
 Cf = 1
