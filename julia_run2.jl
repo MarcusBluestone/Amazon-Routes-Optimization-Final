@@ -30,7 +30,7 @@ function filter_distance_matrix(matrix, threshold)
 end
 
 # Example usage
-distance_threshold = 100.0  # Example threshold
+distance_threshold = 21.0  # Example threshold
 filtered_Tx = filter_distance_matrix(Tx, distance_threshold)
 filtered_Ty = filter_distance_matrix(Ty, distance_threshold)
 filtered_Tz = filter_distance_matrix(Tz, distance_threshold)
