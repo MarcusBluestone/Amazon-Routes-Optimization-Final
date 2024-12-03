@@ -13,20 +13,20 @@ import matplotlib.pyplot as plt
 # cand_factories = np.array(info_json['factories'])
 # demands = np.array(info_json['demands'])
 
-parser = argparse.ArgumentParser(description="A sample Python script.")
-parser.add_argument("--N", type=str, required=True, help="Number of Demands")
+parser = argparse.ArgumentParser()
+parser.add_argument("--i", type=str, required=True, help="Cluster Region Number")
 args = parser.parse_args()
 
-N = int(args.N)
+directory = f'clusters/{int(args.i)}'
 
-scale = 1
-unique_stores_pd = pd.read_csv('real_distances/unique_stores.csv').applymap(lambda x : scale * x)
-demands_pd = pd.read_csv('real_distances/unique_drops.csv').applymap(lambda x : scale * x)
+unique_stores_pd = pd.read_csv(f'{directory}/stores.csv')
+demands_pd = pd.read_csv(f'{directory}/demand.csv')
+
 print(demands_pd)
 cand_factories = list(zip(unique_stores_pd['Latitude'], unique_stores_pd['Longitude']))
-demands = list(zip(list(demands_pd['Latitude'][:N]), list(demands_pd['Longitude'][:N])))
+demands = list(zip(list(demands_pd['Latitude']), list(demands_pd['Longitude'])))
 
-with h5py.File('results/output.h5', 'r') as f:
+with h5py.File(f'{directory}/output.h5', 'r') as f:
     # List all datasets
     print("Datasets in the file:", list(f.keys()))
     factory_indic = f['factories'].__array__() #indicator for each factory
@@ -46,10 +46,10 @@ for i in range(len(cand_factories)):
     color = 'grey'
     if factory_indic[i] == 1:
         color = 'blue'
-    G.add_node(str(i) + 'F', color=color, pos=cand_factories[i])
+    G.add_node(str(i) + 'F', color=color, pos=cand_factories[i], node_size = 10)
 
 G.add_nodes_from(
-    [(str(i) + 'D', {"color": 'red', 'pos': demands[i]}) for i in range(len(demands))]
+    [(str(i) + 'D', {"color": 'red', 'pos': demands[i], 'node_size': 2}) for i in range(len(demands))]
 )
 
 color_num = 0
@@ -86,12 +86,12 @@ node_colors = [G.nodes[node]['color'] for node in G.nodes]
 edge_colors = [G.edges[edge]['color'] for edge in G.edges]
 pos = nx.get_node_attributes(G, 'pos')  
 
-plt.figure(3,figsize=(10,10)) 
+plt.figure(3,figsize=(20,20)) 
 
-nodes = nx.draw_networkx_nodes(G, pos=pos, node_color=node_colors, node_size=1)
+nodes = nx.draw_networkx_nodes(G, pos=pos, node_color=node_colors)
 nodes.set_zorder(1)
 edges = nx.draw_networkx_edges(G, pos=pos, edge_color=edge_colors, connectionstyle='arc3,rad=0.2', arrows=True, hide_ticks=False)
-# labels = nx.draw_networkx_labels(G, pos=pos, font_size=5)
+
 plt.xlabel('Latitude', fontsize=12)
 plt.tick_params(
     axis='both',          # Apply to both x and y axes
@@ -104,7 +104,7 @@ plt.tick_params(
     labelleft=True        # Show labels on the left axis
 )
 
-plt.ylabel('Longitude', fontsize=12)
+plt.ylabel('Longitude', fontsize=20)
 
 # Ensure axes are visible
 plt.axis('on')
@@ -113,5 +113,5 @@ plt.axis('on')
 plt.tight_layout()
 
 
-plt.savefig("graph.jpg")
+plt.savefig(f"{directory}/output_graph.jpg")
 # nx.draw_networkx(G, pos=pos,node_color=node_colors, edge_color=edge_colors,connectionstyle='arc3,rad=0.2', arrows=True, font_size=5)
