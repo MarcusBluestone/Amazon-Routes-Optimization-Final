@@ -17,11 +17,6 @@ parser = argparse.ArgumentParser(description="A sample Python script.")
 parser.add_argument("--N", type=str, required=True, help="Number of Demands")
 args = parser.parse_args()
 
-try:
-    N = int(args.N)
-except ValueError:
-    N = 4356
-
 scale = 1
 unique_stores_pd = pd.read_csv('real_distances/unique_stores.csv').applymap(lambda x : scale * x)
 demands_pd = pd.read_csv('real_distances/unique_drops.csv').applymap(lambda x : scale * x)

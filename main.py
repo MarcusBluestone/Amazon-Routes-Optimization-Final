@@ -14,12 +14,18 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     print(args)
+
+    try:
+        N = int(args.N)
+    except TypeError:
+        N = 4356
+
     durations = []
     if not args.real:
             # duration_total = 0
             # for _ in range(3):
             #     start_time = datetime.datetime.now()
-                subprocess.run(["python", 'create_data.py', '--size', str(args.size), '--demand_cnt', str(args.N),
+                subprocess.run(["python", 'create_data.py', '--size', str(args.size), '--demand_cnt', str(N),
                                                             '--M', str(args.M)], check=True)
                 subprocess.run(["julia", 'julia_run.jl', str(args.S), str(args.a)], check=True)
                 subprocess.run(["python", 'analyze.py'], check=True)
@@ -31,6 +37,6 @@ if __name__ == "__main__":
             # with open('durations.pkl', 'wb') as f:
             #     pickle.dump(durations, f)
     else:
-        subprocess.run(["julia", 'julia_run.jl', str(args.S), str(args.a), str(args.N)], check=True)
+        subprocess.run(["julia", 'julia_run2.jl', str(args.S), str(args.a), str(N)], check=True)
         subprocess.run(["python", 'analyze.py', '--N', str(args.N)], check=True)
 
