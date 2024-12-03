@@ -48,16 +48,23 @@ println("S: ", S)
 model = Model(Gurobi.Optimizer)
 set_optimizer_attribute(model, "TimeLimit", 60 * 60 * 7)
 
+println("Demand->Demand Edges: ", length(filtered_Tx))
+println("Factory->Demand Edges: ", length(filtered_Ty))
+println("Demand->Factory Edges: ", length(filtered_Tz))
+
+
+
 @variable(model, o[1:M], Bin)
-
 @variable(model, x[k=1:S, (j1, j2) in keys(filtered_Tx)], Bin)
-
 @variable(model, y[k=1:S, (i, j) in keys(filtered_Ty)], Bin)
 @variable(model, z[k=1:S, (j, i) in keys(filtered_Tz)], Bin)
 @variable(model, f[1:S] >= 0)
 @variable(model, u[1:N] >= 1)
 @variable(model, L >= 0)
 
+println("Variables Created")
+
+@objective(model, Min, 0)
 
 # @objective(model, Min, (Cf*sum(o[i] for i in 1:M) + 
 # Ct * sum(y[k, i, j] for k in 1:S, i in 1:M, j in 1:N) + 
@@ -92,7 +99,7 @@ set_optimizer_attribute(model, "TimeLimit", 60 * 60 * 7)
 @objective(model, Min, L)
 
 #MTZ Constraitns
-@constraint(model, [k=1:S, j=1:N], u[j] <= N)
+@constraint(model, [j=1:N], u[j] <= N)
   
 
 #(MTZ) Between Demand Locations
@@ -104,11 +111,13 @@ set_optimizer_attribute(model, "TimeLimit", 60 * 60 * 7)
     u[j2] - u[j1] >= 1 - N * (1 - sum(x[k, (j1, j2)] for k in 1:S))
 )
 
-
+println("Finished MTZ")
 # Optional additional constriant
 
 # @constraint(model, [j=1:N, k=1:S],x[k,j,j] == 0)
 @constraint(model, [j=1:N, k=1:S], x[k, (j, j)] == 0)
+
+println("Finished No Self Loops")
 
 # end additional constraint
 
@@ -118,7 +127,6 @@ set_optimizer_attribute(model, "TimeLimit", 60 * 60 * 7)
 @constraint(model, [k=1:S], 
     sum(y[k, (i, j)] for (i, j) in keys(filtered_Ty)) <= 1
 )
-
 
 #Trucks can only travel if they first leave from a factory 
 @constraint(model, [k=1:S], 
@@ -132,30 +140,43 @@ set_optimizer_attribute(model, "TimeLimit", 60 * 60 * 7)
 )
 
 #Trucks start and end at the same factory
-
-
 @constraint(model, [k=1:S, i=1:M],
     sum(z[k, (j, i)] for (j, f) in keys(filtered_Tz)if f == i) ==
     sum(y[k, (i, j)] for (f, j) in keys(filtered_Ty) if f == i)
 )
 
+println("Finished Factory Constraints")
+
+
+
 #FLOW CONSTRAINTS
 #SUM IN = 1
+function edges_end_at(edges, end_node)
+    return [(x, y) for (x, y) in keys(edges) if y == end_node]
+end
+function edges_start_at(edges, start_node)
+    return [(x, y) for (x, y) in keys(edges) if x == start_node]
+end
 
-# @constraint(model, [j2=1:N], sum(sum(y[k, i, j2] for (i, j) in filtered_Ty if j == j2) +
-#                                   sum(x[k, j1, j2] for (j1, j2) in filtered_Tx if j2 == j2)
-#                                   for k in 1:S) == 1)
+ends_at_dict_Tx = Dict(j2 => edges_end_at(filtered_Tx, j2) for j2 in 1:N)
+ends_at_dict_Ty = Dict(j2 => edges_end_at(filtered_Ty, j2) for j2 in 1:N)
 
 @constraint(model, [j2=1:N], 
     sum(
-        sum(y[k, (i, j2)] for (i, j) in keys(filtered_Ty) if j == j2) +
-        sum(x[k, (j1, j2)] for (j1, dem) in keys(filtered_Tx) if dem == j2) for k in 1:S
+        sum(y[k, (i, j2)] for (i, j) in ends_at_dict_Ty[j2]) +
+        sum(x[k, (j1, j2)] for (j1, dem) in ends_at_dict_Tx[j2]) 
+        for k in 1:S
     ) == 1
 )
-# for j1 in 1:N  #SUM OUT = 1
-#     @constraint(model, sum(sum(x[k,j1,j2] for j2 in 1:N) + sum(z[k,j1,i] for i in 1:M) for k in 1:S) == 1)
-# end 
+# @constraint(model, [j2=1:N], 
+#     sum(
+#         sum(y[k, (i, j2)] for (i, j) in keys(filtered_Ty) if j == j2) +
+#         sum(x[k, (j1, j2)] for (j1, dem) in keys(filtered_Tx) if dem == j2) 
+#         for k in 1:S
+#     ) == 1
+# )
 
+println("Finished Flow In Constraints")
 #If truck k enters location j, it must exit location j
 
 # @constraint(model, [j=1:N, k=1:S],
@@ -163,13 +184,22 @@ set_optimizer_attribute(model, "TimeLimit", 60 * 60 * 7)
 #     (sum(x[k, (j, j2)] for j2 in 1:N) + sum(z[k, (j, i)] for i in 1:M))
 # )
 
-@constraint(model, [j=1:N, k=1:S],
-    (sum(y[k, (i, j)] for i in 1:M if (i, j) in keys(filtered_Ty)) + 
-     sum(x[k, (j1, j)] for j1 in 1:N if (j1, j) in keys(filtered_Tx))) == 
-    (sum(x[k, (j, j2)] for j2 in 1:N if (j, j2) in keys(filtered_Tx)) + 
-     sum(z[k, (j, i)] for i in 1:M if (j, i) in keys(filtered_Tz)))
-)
+starts_at_dict_Tx = Dict(j1 => edges_start_at(filtered_Tx, j1) for j1 in 1:N)
+starts_at_dict_Tz = Dict(j => edges_start_at(filtered_Tz, j) for j in 1:N)
 
+@constraint(model, [j=1:N, k=1:S], (sum(y[k, (i, j)] for (i,j) in ends_at_dict_Ty[j]) + 
+                                    sum(x[k, (j1, j)] for (j1,j) in ends_at_dict_Tx[j])) == 
+                                    (sum(x[k, (j, j2)] for (j,j2) in starts_at_dict_Tx[j]) + 
+                                    sum(z[k, (j, i)] for (j,i) in starts_at_dict_Tz[j])))
+
+# @constraint(model, [j=1:N, k=1:S],
+#     (sum(y[k, (i, j)] for i in 1:M if (i, j) in keys(filtered_Ty)) + 
+#      sum(x[k, (j1, j)] for j1 in 1:N if (j1, j) in keys(filtered_Tx))) == 
+#     (sum(x[k, (j, j2)] for j2 in 1:N if (j, j2) in keys(filtered_Tx)) + 
+#      sum(z[k, (j, i)] for i in 1:M if (j, i) in keys(filtered_Tz)))
+# )
+
+println("Finished Flow Constraints")
 # Time constraints
 
 @constraint(model, [k=1:S], 
