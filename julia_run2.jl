@@ -81,20 +81,20 @@ println("Variables Created")
 #          sum(x[k, j1, j2] * Tx[j1, j2] for (j1, j2) in filtered_Tx)) for k in 1:S) + 
 # (1 - alpha) * L)
 
-# @objective(model, Min,
-#     alpha * (
-#         Cf * sum(o[i] for i in 1:M) +
-#         Ct * sum(y[k, i, j] for k in 1:S, (i, j) in filtered_Ty) +
-#         Cw * (
-#             sum(y[k, i, j] * Ty[i, j] for k in 1:S, (i, j) in filtered_Ty) +
-#             sum(z[k, j, i] * Tz[j, i] for k in 1:S, (j, i) in filtered_Tz) +
-#             sum(x[k, j1, j2] * Tx[j1, j2] for k in 1:S, (j1, j2) in filtered_Tx)
-#         )
-#     ) +
-#     (1 - alpha) * L
-# )
+@objective(model, Min,
+    alpha * (
+        Cf * sum(o[i] for i in 1:M) + Ct * sum(y[k, (i, j)] for k in 1:S, (i, j) in keys(filtered_Ty)) + 
+        Cw * (
+             sum(y[k, (i, j)] * Ty[i, j] for k in 1:S, (i, j) in keys(filtered_Ty)) +
+             sum(z[k, (j, i)] * Tz[j, i] for k in 1:S, (j, i) in keys(filtered_Tz)) + 
+             sum(x[k, (j1, j2)] * Tx[j1, j2] for k in 1:S, (j1, j2) in keys(filtered_Tx))
+        )
+    ) +
+    (1 - alpha) * L
+)
 
-@objective(model, Min, L)
+# @objective(model, Min, L)
+println("Objective Formulated")
 
 #MTZ Constraitns
 @constraint(model, [j=1:N], u[j] <= N)
