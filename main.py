@@ -30,14 +30,15 @@ if __name__ == "__main__":
                 subprocess.run(["julia", 'julia_run3.jl', str(args.S), str(args.a), directory], check=True)
             except subprocess.CalledProcessError:
                 print("Infeasible!")
-
-    durations = []
-    if not args.real:
-        subprocess.run(["python", 'create_data.py', '--size', str(args.size), '--demand_cnt', str(N),
-                                                    '--M', str(args.M)], check=True)
-        subprocess.run(["julia", 'julia_run2.jl', str(args.S), str(args.a)], check=True)
-        subprocess.run(["python", 'analyze.py'], check=True)
+            break
     else:
-        subprocess.run(["julia", 'julia_run2.jl', str(args.S), str(args.a), str(N)], check=True)
-        subprocess.run(["python", 'analyze.py', '--N', str(N)], check=True)
+        durations = []
+        if not args.real:
+            subprocess.run(["python", 'create_data.py', '--size', str(args.size), '--demand_cnt', str(N),
+                                                        '--M', str(args.M)], check=True)
+            subprocess.run(["julia", 'julia_run2.jl', str(args.S), str(args.a)], check=True)
+            subprocess.run(["python", 'analyze.py'], check=True)
+        else:
+            subprocess.run(["julia", 'julia_run2.jl', str(args.S), str(args.a), str(N)], check=True)
+            subprocess.run(["python", 'analyze.py', '--N', str(N)], check=True)
 
