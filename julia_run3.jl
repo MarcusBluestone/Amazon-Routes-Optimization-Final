@@ -26,8 +26,8 @@ println("N: ", N)
 println("S: ", S)
 
 model = Model(Gurobi.Optimizer)
-set_optimizer_attribute(model, "TimeLimit", 60 * 60 * 7) #for real
-set_optimizer_attribute(model, "TimeLimit", 45 * 60) #for simulated
+#set_optimizer_attribute(model, "TimeLimit", 60 * 60 * 7) #for real
+set_optimizer_attribute(model, "TimeLimit", 60 * 60) #for simulated
 
 
 @variable(model, o[1:M], Bin)
@@ -52,13 +52,11 @@ Cw * sum(sum(y[k,i,j]*Ty[i,j] + z[k,j,i]*Tz[j,i] for i in 1:M, j in 1:N) + sum(x
 #MTZ Constraitns
 @constraint(model, [j=1:N], u[j] <= N)
   
-
 #(MTZ) Between Demand Locations
 @constraint(model, [j1=1:N, j2=1:N; j1 != j2], u[j2] - u[j1] >= 1 - N * (1 - sum(x[k, j1, j2] for k in 1:S)))
 
 
 # Optional additional constriant
-
 @constraint(model, [j=1:N, k=1:S],x[k,j,j] == 0)
 
 # end additional constraint

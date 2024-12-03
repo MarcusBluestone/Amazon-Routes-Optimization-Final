@@ -22,7 +22,7 @@ if __name__ == "__main__":
         N = 4356
 
     if args.cluster:
-        for i in range(24):
+        for i in range(12,24):
             directory = f'clusters/{i}'
             print(f"Here in directory {directory}")
             try:
@@ -31,8 +31,7 @@ if __name__ == "__main__":
                 print("Infeasible!")
             else:
                 subprocess.run(["python", 'analyze.py', '--i', str(i)])
-            
-            break        
+
     else:
         durations = []
         if not args.real:
