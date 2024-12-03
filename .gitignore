@@ -1,8 +1,6 @@
-# Ignore everything in the results folder
 results/*
-
-# Ignore everything in the inputs folder
 inputs/*
+clusters/
 
 graph.jpg
 graph.pdf

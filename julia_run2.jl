@@ -38,8 +38,8 @@ filtered_Tz = filter_distance_matrix(Tz, distance_threshold)
 M,N = size(Ty)
 
 Cf = 1
-Cw = 1
-Ct = 3
+Cw = 0
+Ct = 100
 println("a: ", alpha)
 println("M: ", M)
 println("N: ", N)
