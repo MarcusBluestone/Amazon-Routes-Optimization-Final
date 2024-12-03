@@ -11,6 +11,8 @@ if __name__ == "__main__":
     parser.add_argument("--M", type=int, required=False, help="Number of Candidate Factories")
     parser.add_argument("--a", type=float, required=False, help="Alpha Value")
     parser.add_argument("--real", type=bool, required=False, help="Run on Amazon Dataset?")
+    parser.add_argument("--cluster", type=bool, required=False, help="Run on Amazon Dataset?")
+
 
     args = parser.parse_args()
     print(args)
@@ -20,23 +22,22 @@ if __name__ == "__main__":
     except (TypeError, ValueError):
         N = 4356
 
+    if args.cluster:
+        for i in range(24):
+            directory = f'clusters/{i}'
+            print(f"Here in directory {directory}")
+            try:
+                subprocess.run(["julia", 'julia_run3.jl', str(args.S), str(args.a), directory], check=True)
+            except subprocess.CalledProcessError:
+                print("Infeasible!")
+
     durations = []
     if not args.real:
-            # duration_total = 0
-            # for _ in range(3):
-            #     start_time = datetime.datetime.now()
-                subprocess.run(["python", 'create_data.py', '--size', str(args.size), '--demand_cnt', str(N),
-                                                            '--M', str(args.M)], check=True)
-                subprocess.run(["julia", 'julia_run2.jl', str(args.S), str(args.a)], check=True)
-                subprocess.run(["python", 'analyze.py'], check=True)
-            #     duration_total += (datetime.datetime.now() - start_time).total_seconds()
-            # durations.append(duration_total / 3)
-            # print(durations[-1])
-
-        
-            # with open('durations.pkl', 'wb') as f:
-            #     pickle.dump(durations, f)
+        subprocess.run(["python", 'create_data.py', '--size', str(args.size), '--demand_cnt', str(N),
+                                                    '--M', str(args.M)], check=True)
+        subprocess.run(["julia", 'julia_run2.jl', str(args.S), str(args.a)], check=True)
+        subprocess.run(["python", 'analyze.py'], check=True)
     else:
         subprocess.run(["julia", 'julia_run2.jl', str(args.S), str(args.a), str(N)], check=True)
-     #   subprocess.run(["python", 'analyze.py', '--N', str(N)], check=True)
+        subprocess.run(["python", 'analyze.py', '--N', str(N)], check=True)
 
