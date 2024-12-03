@@ -4,6 +4,7 @@
 - Arguments:
 1. Run on Amazon Dataset: --size --S --a --real True
 2. Run on Simulation: --size --S --a --M --N
+3. Run w/ Clustering: --cluster True --S --a
 - Final image ouputted in graph.jpg
 
 ## Instruction (Notebooks)

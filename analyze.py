@@ -22,7 +22,6 @@ directory = f'clusters/{int(args.i)}'
 unique_stores_pd = pd.read_csv(f'{directory}/stores.csv')
 demands_pd = pd.read_csv(f'{directory}/demand.csv')
 
-print(demands_pd)
 cand_factories = list(zip(unique_stores_pd['Latitude'], unique_stores_pd['Longitude']))
 demands = list(zip(list(demands_pd['Latitude']), list(demands_pd['Longitude'])))
 
@@ -80,8 +79,6 @@ for truck_num in range(S):
         color_num = (color_num + 1) % len(color_list)
 
 
-# print(G.nodes)
-# print(G.edges)
 node_colors = [G.nodes[node]['color'] for node in G.nodes]
 edge_colors = [G.edges[edge]['color'] for edge in G.edges]
 pos = nx.get_node_attributes(G, 'pos')  
