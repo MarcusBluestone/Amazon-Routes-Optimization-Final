@@ -1,10 +1,15 @@
 # Optimization Final Project (6.C57)
+
+## Clustering Instructions
+- Run all cells in cluster.ipynb --> this sets up all the proper data (don't worry, this won't get uploaded to git)
+- python main.py --cluster True --S --a 
+- Results saved by region in the clusters folder
+
 ## Instructions (Main)
 - `python main.py` into terminal.
 - Arguments:
 1. Run on Amazon Dataset: --size --S --a --real True
 2. Run on Simulation: --size --S --a --M --N
-3. Run w/ Clustering: --cluster True --S --a
 - Final image ouputted in graph.jpg
 
 ## Instruction (Notebooks)
