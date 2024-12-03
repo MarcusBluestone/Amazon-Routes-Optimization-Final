@@ -27,7 +27,7 @@ if __name__ == "__main__":
             #     start_time = datetime.datetime.now()
                 subprocess.run(["python", 'create_data.py', '--size', str(args.size), '--demand_cnt', str(N),
                                                             '--M', str(args.M)], check=True)
-                subprocess.run(["julia", 'julia_run.jl', str(args.S), str(args.a)], check=True)
+                subprocess.run(["julia", 'julia_run2.jl', str(args.S), str(args.a)], check=True)
                 subprocess.run(["python", 'analyze.py'], check=True)
             #     duration_total += (datetime.datetime.now() - start_time).total_seconds()
             # durations.append(duration_total / 3)
