@@ -34,15 +34,15 @@ if __name__ == "__main__":
                 subprocess.run(["python", 'analyze.py', '--i', str(i)])
 
     elif args.cluster and args.baseline:
-        for i in range(12,24):
+        for i in range(0,12):
             directory = f'clusters/{i}'
-            print(f"Here in directory {directory}")
+            print(f"Here in directory baseline {directory}")
             try:
                 subprocess.run(["julia", 'julia_run4.jl', str(args.a), directory], check=True)
             except subprocess.CalledProcessError:
                 print("Infeasible!")
-            else:
-                subprocess.run(["python", 'analyze.py', '--i', str(i)])
+            # else: # I didn't want to overwrite the regular files with this so need to change the directory or file names
+            #     subprocess.run(["python", 'analyze.py', '--i', str(i)])
 
     else:
         durations = []

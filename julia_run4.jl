@@ -23,7 +23,6 @@ Ct = 1
 println("a: ", alpha)
 println("M: ", M)
 println("N: ", N)
-println("S: ", S)
 
 model = Model(Gurobi.Optimizer)
 #set_optimizer_attribute(model, "TimeLimit", 60 * 60 * 7) #for real
@@ -45,7 +44,7 @@ set_optimizer_attribute(model, "TimeLimit", 60 * 60) #for simulated
 
 
 @objective(model, Min, alpha*(Cf*M + 
-Ct * sum(y[i, j] for i in 1:M, j in 1:N) + 
+Ct * M + 
 Cw * sum(sum(y[i,j]*Ty[i,j] + z[j,i]*Tz[j,i] for i in 1:M, j in 1:N) + sum(x[k, j1, j2] * Tx[j1, j2] for j1 in 1:N, j2 in 1:N) for k in 1:M)) +
 (1 - alpha) * L)
 
@@ -53,7 +52,7 @@ Cw * sum(sum(y[i,j]*Ty[i,j] + z[j,i]*Tz[j,i] for i in 1:M, j in 1:N) + sum(x[k, 
 @constraint(model, [j=1:N], u[j] <= N)
   
 #(MTZ) Between Demand Locations
-@constraint(model, [j1=1:N, j2=1:N; j1 != j2], u[j2] - u[j1] >= 1 - N * (1 - sum(x[k, j1, j2] for k in 1:S)))
+@constraint(model, [j1=1:N, j2=1:N; j1 != j2], u[j2] - u[j1] >= 1 - N * (1 - sum(x[k, j1, j2] for k in 1:M)))
 
 
 # Optional additional constriant
@@ -67,14 +66,14 @@ Cw * sum(sum(y[i,j]*Ty[i,j] + z[j,i]*Tz[j,i] for i in 1:M, j in 1:N) + sum(x[k, 
 
 
 # Factory path must start at a factory
-@constraint(model, [k=1:M], sum(x[M,j1,j2] for j1 in 1:N, j2 in 1:N) <= (N - 1) * sum(y[i,j] for i in 1:M, j in 1:N))
+@constraint(model, [k=1:M], sum(x[k,j1,j2] for j1 in 1:N, j2 in 1:N) <= (N - 1) * sum(y[k,j] for j in 1:N))
 
 
 #Trucks can only leave used factories  -----NOW ALL FACTORIES USED
 # @constraint(model, [i=1:M], sum(y[k,i,j] for k in 1:S, j in 1:N) <= S * o[i]) #changed this from N to S
 
 
-#Trucks start and end at the same factory
+#Trucks start and end at the same factory Now just start and stop same number of times meaningless
 @constraint(model, [i=1:M], sum(z[j,i] for j in 1:N) == sum(y[i,j] for j in 1:N))
 
 
@@ -89,7 +88,7 @@ Cw * sum(sum(y[i,j]*Ty[i,j] + z[j,i]*Tz[j,i] for i in 1:M, j in 1:N) + sum(x[k, 
 
 #If Factory k enters location j, it must exit location j
 
-@constraint(model, [j=1:N, k=1:M],(y[k,j] + sum(x[k,j1,j] for j1 in 1:N)) == (sum(x[k,j,j2] for j2 in 1:N) + sum(z[j,i] for i in 1:M)) )
+@constraint(model, [j=1:N, k=1:M],(y[k,j] + sum(x[k,j1,j] for j1 in 1:N)) == (sum(x[k,j,j2] for j2 in 1:N) + z[j,k]) )
 
 
 # Time constraints
@@ -98,17 +97,17 @@ Cw * sum(sum(y[i,j]*Ty[i,j] + z[j,i]*Tz[j,i] for i in 1:M, j in 1:N) + sum(x[k, 
 
 # I think missing a condtition for whether a factory exists by just seeing if an edge goes out of it
 
-@constraint(model, [k=1:S], f[k] <= L)
+@constraint(model, [k=1:M], f[k] <= L)
 
 optimize!(model)
 
 
 try
-    rm(directory * "/output.h5")
+    rm(directory * "/baseline_output.h5")
 catch
     1
 end
-h5write(directory * "/output.h5", "factories", value.(o))
-h5write(directory * "/output.h5", "x_edges", value.(x))
-h5write(directory * "/output.h5", "y_edges", value.(y))
-h5write(directory * "/output.h5", "z_edges", value.(z))
+h5write(directory * "/baseline_output.h5", "factories", value.(o))
+h5write(directory * "/baseline_output.h5", "x_edges", value.(x))
+h5write(directory * "/baseline_output.h5", "y_edges", value.(y))
+h5write(directory * "/base_lineoutput.h5", "z_edges", value.(z))
