@@ -88,3 +88,11 @@ data = pd.read_csv(file_path)
 tot_amaz = data['Distance_km'].sum()
 
 print("Total Distance Amazon (km):", tot_amaz)
+
+file_path2 = "real_distances/distances_only_unique.csv"  # Replace with your file path
+data2 = pd.read_csv(file_path2)
+
+# Sum the 'Distance_km' column
+tot_amaz2 = data2['Distance_km'].sum()
+
+print("Total Distance Amazon Unique (km):", tot_amaz2)
