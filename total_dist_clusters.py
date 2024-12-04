@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 
 overall_total = 0
+all_stores_array = []
+tot_facs = 0
 for i in range(0, 12):
     # Directory where the .h5 file is saved
     directory = f"clusters/{i}"
@@ -10,10 +12,12 @@ for i in range(0, 12):
     Tx = pd.read_csv(f"{directory}/demand_distance.csv").iloc[:, 1:].to_numpy()  # N x N
     Ty = pd.read_csv(f"{directory}/store_demand_distance.csv").iloc[:, 1:].to_numpy()  # M x N
     Tz = pd.read_csv(f"{directory}/demand_store_distance.csv").iloc[:, 1:].to_numpy()  # N x M
-
+    stores = pd.read_csv(f"{directory}/stores.csv").iloc[:, 1:].to_numpy() 
+    
     print("Tx shape:", Tx.shape)
     print("Ty shape:", Ty.shape)
     print("Tz shape:", Tz.shape)
+    
     # Load the data from the .h5 file
     with h5py.File(f"{directory}/output.h5", "r") as f:
         factories = np.array(f["factories"])  # Load factories matrix
@@ -21,9 +25,18 @@ for i in range(0, 12):
         y_edges = np.array(f["y_edges"])      # Load y_edges matrix
         z_edges = np.array(f["z_edges"])      # Load z_edges matrix
 
+    tot_facs += np.sum(factories)
+    facs = stores[factories == 1]
+    # print("facs here ", facs)
+    # print(factories)
+    all_stores_array.append(facs)
+    
     print("X shape:", x_edges.shape)
     print("Y shape:", y_edges.shape)
     print("Z shape:", z_edges.shape)
+    print("Factories Shape: ", factories.shape[0])
+    # print(np.sum(factories))
+    # print(factories)
     # Perform the calculations
     # Example: Assuming the same shape as the distance matrix
     # total_distance = (
@@ -55,6 +68,17 @@ for i in range(0, 12):
     overall_total += total_distance
     print(f"Total distance for cluster {i}:", total_distance)
 print(f"Total together: {overall_total}")
+
+
+combined_coordinates = np.vstack(all_stores_array)
+print("Total non-unique stoes = ", combined_coordinates.shape[0])
+unique_coordinates = np.unique(combined_coordinates, axis=0)
+# Get the number of unique coordinates
+num_unique_coordinates = unique_coordinates.shape[0]
+print("Number of unique stoes = ", num_unique_coordinates)
+
+objective_val = tot_facs * 3 + 4*12 + .01 * overall_total
+print("Final Objective Value = ", objective_val)
 
 # Load the CSV file
 file_path = "real_distances/distances_only.csv"  # Replace with your file path
