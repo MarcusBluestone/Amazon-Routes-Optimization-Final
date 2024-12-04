@@ -12,6 +12,7 @@ if __name__ == "__main__":
     parser.add_argument("--a", type=float, required=False, help="Alpha Value")
     parser.add_argument("--real", type=bool, required=False, help="Run on Amazon Dataset?")
     parser.add_argument("--cluster", type=bool, required=False, help="Run on Amazon Dataset?")
+    parser.add_argument("--baseline", type=bool, required=False, help="Evaluate the baseline")
 
     args = parser.parse_args()
     print(args)
@@ -21,12 +22,23 @@ if __name__ == "__main__":
     except (TypeError, ValueError):
         N = 4356
 
-    if args.cluster:
+    if args.cluster and not args.baseline:
         for i in range(12,24):
             directory = f'clusters/{i}'
             print(f"Here in directory {directory}")
             try:
                 subprocess.run(["julia", 'julia_run3.jl', str(args.S), str(args.a), directory], check=True)
+            except subprocess.CalledProcessError:
+                print("Infeasible!")
+            else:
+                subprocess.run(["python", 'analyze.py', '--i', str(i)])
+
+    elif args.cluster and args.baseline:
+        for i in range(12,24):
+            directory = f'clusters/{i}'
+            print(f"Here in directory {directory}")
+            try:
+                subprocess.run(["julia", 'julia_run4.jl', str(args.a), directory], check=True)
             except subprocess.CalledProcessError:
                 print("Infeasible!")
             else:
