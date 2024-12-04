@@ -5,7 +5,10 @@ import pandas as pd
 overall_total = 0
 all_stores_array = []
 tot_facs = 0
-for i in range(0, 12):
+start = 0
+end = 24
+max_wait = 0
+for i in range(start, end):
     # Directory where the .h5 file is saved
     directory = f"clusters/{i}"
 
@@ -63,6 +66,13 @@ for i in range(0, 12):
     total_distance_y = np.sum(y_weighted)
     total_distance_z = np.sum(z_weighted)
 
+    for k in range(4):
+        x_weighted2 = x_edges[:, :, k] * Tx  # Shape: (N, N)
+        y_weighted2 = Y_transposed[:, :, k] * Ty  # Shape: (M, N)
+        temp = np.sum(x_weighted2) + np.sum(y_weighted2)
+        max_wait = max(max_wait, temp)
+    
+
     # Total combined distance
     total_distance = total_distance_x + total_distance_y + total_distance_z
     overall_total += total_distance
@@ -77,7 +87,7 @@ unique_coordinates = np.unique(combined_coordinates, axis=0)
 num_unique_coordinates = unique_coordinates.shape[0]
 print("Number of unique stoes = ", num_unique_coordinates)
 
-objective_val = tot_facs * 3 + 4*12 + .01 * overall_total
+objective_val = tot_facs * 3 + 4*len(range(start, end)) + .01 * overall_total
 print("Final Objective Value = ", objective_val)
 
 # Load the CSV file
@@ -96,3 +106,5 @@ data2 = pd.read_csv(file_path2)
 tot_amaz2 = data2['Distance_km'].sum()
 
 print("Total Distance Amazon Unique (km):", tot_amaz2)
+print("Longest wait time = ", max_wait)
+print("Final objective with wait * .5: ", .5*objective_val + .5 * max_wait)
