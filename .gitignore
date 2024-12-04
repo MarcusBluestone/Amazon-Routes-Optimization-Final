@@ -7,5 +7,6 @@ graph.pdf
 growth.png
 durations.pkl
 counts.png
+.DS_Store
 
 real_distances/drop_distance_matrix.csv
