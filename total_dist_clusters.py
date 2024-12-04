@@ -5,7 +5,7 @@ import pandas as pd
 overall_total = 0
 all_stores_array = []
 tot_facs = 0
-for i in range(0, 12):
+for i in range(12, 24):
     # Directory where the .h5 file is saved
     directory = f"clusters/{i}"
 
