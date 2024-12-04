@@ -55,3 +55,12 @@ for i in range(0, 12):
     overall_total += total_distance
     print(f"Total distance for cluster {i}:", total_distance)
 print(f"Total together: {overall_total}")
+
+# Load the CSV file
+file_path = "real_distances/distances_only.csv"  # Replace with your file path
+data = pd.read_csv(file_path)
+
+# Sum the 'Distance_km' column
+tot_amaz = data['Distance_km'].sum()
+
+print("Total Distance Amazon (km):", tot_amaz)
