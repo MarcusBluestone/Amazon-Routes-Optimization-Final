@@ -1,6 +1,10 @@
 # Optimization Final Project (6.C57)
 
 ## Files Overview:
+1. The folders and notebooks should be ignored; they were only used for initial testing and debugging.
+2. `main.py` is responsible for actually running the code. See info below for how to run with arguments
+3. `analyze.py` is responsible for creating the graph of the resulting simulations.
+   
 ## Clustering Instructions
 - Run all cells in cluster.ipynb --> this sets up all the proper data (don't worry, this won't get uploaded to git)
 - python main.py --cluster True --S --a 
