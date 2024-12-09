@@ -1,5 +1,6 @@
 # Optimization Final Project (6.C57)
 
+## Files Overview:
 ## Clustering Instructions
 - Run all cells in cluster.ipynb --> this sets up all the proper data (don't worry, this won't get uploaded to git)
 - python main.py --cluster True --S --a 
