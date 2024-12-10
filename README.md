@@ -1,4 +1,5 @@
 # Optimization Final Project (6.C57)
+[`overview.pdf`](overview.pdf) contains the final version of our paper
 
 ## Files Overview:
 1. The folders and notebooks should be ignored; they were only used for initial testing and debugging.
